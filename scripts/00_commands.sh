@@ -10,38 +10,39 @@
 # Initialise git repository
 git init
 
-# Extract data
-tar -zxvf FastQC_Short.tar.gz
-
-# Individually compress files
-gzip FastQC_Short/*
-
-# Specify files to be ignored by git
-echo 'FastQC_Short/*fastq.gz' > .gitignore
-echo 'FastQC_Short.tar.gz' >> .gitignore
-
 # Organize working directory
-mkdir output
-mkdir output/trimmed
+mkdir -p data/trimmed
+mkdir -p output/fastqc/trimmed
+mkdir -p output/fastqc/raw
+mkdir -p output/multiqc/trimmed
+mkdir -p output/multiqc/raw
 mkdir scripts
 mkdir thirdP_software
 
+# Extract data
+tar -zxf FastQC_Short.tar.gz -C data/
+
+# Individually compress files
+gzip data/FastQC_Short/*
+
+# Specify files to be ignored by git
+echo 'data/FastQC_Short/*fastq.gz' > .gitignore
+echo 'FastQC_Short.tar.gz' >> .gitignore
+
 # Run fastqc on fastq files
 # find FastQC_Short/ -name "*fastq" -exec fastqc -O output/ {} \;
-fastqc -O output/ FastQC_Short/*fastq.gz
+fastqc -O output/fastqc/raw data/FastQC_Short/*fastq.gz
 
 # Parse fastqc results through multiQC
 # For more info, visit: http://multiqc.info/docs/
 # Install multiQC
 
-# cd thirdP_software
-# git clone https://github.com/ewels/MultiQC.git
-# cd MultiQC
-# python setup.py install
-# ../../
+# conda create --name py2.7 python=2.7
+# source activate py2.7
+# conda install -c bioconda multiqc
 
 # run multiQC
-multiqc output/ -o output/
+multiqc output/fastqc/raw -o output/multiqc/raw
 
 # From this file one can see the following:
 # All samples have a good mean Phred score for all positions
@@ -64,8 +65,18 @@ multiqc output/ -o output/
 
 
 # Trimm files according to fastqc results
-for file in FastQC_Short/*fastq.gz; do
+for file in data/FastQC_Short/*fastq.gz; do
 filename=$(basename $file)
 java -jar thirdP_software/Trimmomatic-0.36/trimmomatic-0.36.jar SE -phred33 \
-$file output/trimmed/$filename LEADING:11 SLIDINGWINDOW:4:30 MINLEN:50
+$file data/trimmed/$filename HEADCROP:11 SLIDINGWINDOW:4:30 MINLEN:50 \
+ILLUMINACLIP:thirdP_software/Trimmomatic-0.36/adapters/TruSeq3-SE.fa:2:0:10
 done
+
+# Run fastqc on trimmed files
+fastqc -O output/fastqc/trimmed data/trimmed/*fastq.gz
+
+# Evaluate fastqc results with multiqc
+multiqc output/fastqc/trimmed -o output/multiqc/trimmed
+
+# Close anaconda environment
+source deactivate
