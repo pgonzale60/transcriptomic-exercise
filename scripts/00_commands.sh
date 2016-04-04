@@ -87,3 +87,28 @@ Trinity --seqType fq --SS_lib_type RF \
 --right data/trinSeqs/Sp_log.right.fq.gz,data/trinSeqs/Sp_hs.right.fq.gz,data/trinSeqs/Sp_plat.right.fq.gz,data/trinSeqs/Sp_ds.right.fq.gz \
 --CPU 2 --max_memory 1G --trimmomatic \
 --output output/trinity
+
+# Mapping transcripts
+## We *copy* the *.P.qtrim.gz files resulting from trinity to another folder
+mkdir -p output/trinity/raw
+ln -s output/trinity/*.P.qtrim.gz output/trinity/raw
+## First we download the fasta genome, move it to data/genomes, and:
+mkdir data/genomes
+gmap_build -d genome -D data/genomes -k 13 Sp_genome.fa
+gmap -n 0 -D data/genomes -d genome output/trinity/Trinity.fasta -f samse > output/trinity/trinity_gmap.sam
+
+# TopHat
+tophat2 -I 300 -i 20 data/genomes/Sp_genome \
+ output/trinity/Sp_log.left.fq.gz.P.qtrim.gz,output/trinity/Sp_hs.left.fq.gz.P.qtrim.gz,output/trinity/Sp_ds.left.fq.gz.P.qtrim.gz,output/trinity/Sp_plat.left.fq.gz.P.qtrim.gz \
+ output/trinity/Sp_log.right.fq.gz.P.qtrim.gz,output/trinity/Sp_hs.right.fq.gz.P.qtrim.gz,output/trinity/Sp_ds.right.fq.gz.P.qtrim.gz,output/trinity/Sp_plat.right.fq.gz.P.qtrim.gz
+
+mv tophat_out/ output/mapping/
+
+# Tarea: mapeo a transcriptoma
+bowtie2-build output/Transcriptome_Mapping/Trinity.fasta output/Transcriptome_Mapping/transcriptome
+
+tophat2 -T output/Transcriptome_Mapping/transcriptome \
+output/trinity/Sp_log.left.fq.gz.P.qtrim.gz,output/trinity/Sp_hs.left.fq.gz.P.qtrim.gz,output/trinity/Sp_ds.left.fq.gz.P.qtrim.gz,output/trinity/Sp_plat.left.fq.gz.P.qtrim.gz \
+ output/trinity/Sp_log.right.fq.gz.P.qtrim.gz,output/trinity/Sp_hs.right.fq.gz.P.qtrim.gz,output/trinity/Sp_ds.right.fq.gz.P.qtrim.gz,output/trinity/Sp_plat.right.fq.gz.P.qtrim.gz
+
+mv tophat_out output/Transcriptome_Mapping
