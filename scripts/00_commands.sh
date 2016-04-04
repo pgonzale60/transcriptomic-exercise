@@ -80,3 +80,10 @@ multiqc output/fastqc/trimmed -o output/multiqc/trimmed
 
 # Close anaconda environment
 source deactivate
+
+# Trinity commands
+Trinity --seqType fq --SS_lib_type RF \
+--left data/trinSeqs/Sp_log.left.fq.gz,data/trinSeqs/Sp_hs.left.fq.gz,data/trinSeqs/Sp_plat.left.fq.gz,data/trinSeqs/Sp_ds.left.fq.gz \
+--right data/trinSeqs/Sp_log.right.fq.gz,data/trinSeqs/Sp_hs.right.fq.gz,data/trinSeqs/Sp_plat.right.fq.gz,data/trinSeqs/Sp_ds.right.fq.gz \
+--CPU 2 --max_memory 1G --trimmomatic \
+--output output/trinity
