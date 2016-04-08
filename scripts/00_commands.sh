@@ -112,3 +112,10 @@ output/trinity/Sp_log.left.fq.gz.P.qtrim.gz,output/trinity/Sp_hs.left.fq.gz.P.qt
  output/trinity/Sp_log.right.fq.gz.P.qtrim.gz,output/trinity/Sp_hs.right.fq.gz.P.qtrim.gz,output/trinity/Sp_ds.right.fq.gz.P.qtrim.gz,output/trinity/Sp_plat.right.fq.gz.P.qtrim.gz
 
 mv tophat_out output/Transcriptome_Mapping
+
+
+################
+## Anotación ###
+################
+# Colocamos los archivos que nos pasó la profesora Selene en la carpeta Downloads
+
