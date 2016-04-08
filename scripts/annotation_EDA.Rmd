@@ -1,0 +1,26 @@
+---
+title: "Anotacion de transcriptoma"
+author: "pgonzale"
+date: "April 8, 2016"
+output: pdf_document
+---
+
+
+# Distribucin de dominios pfam
+Usando su reporte de Trinotate, generen una lista de los dominios de PFAM, ya sea en R o en excel. Generen una gráfica de barras de los 10 dominios más abundantes en la anotación de su transcriptoma. Debajo de la gráfica discutan brevemente (1 párrafo de máximo 10 líneas) cual es la relevancia biológica de conocer estos dominios.
+
+Lo primero fue extraer los Pfams a partir del archivo .xls. Este comando me lo paso Falcon.
+
+```{r, engine='bash', eval=FALSE}
+cut -f8 *xls|sed '1d' | sed '/^.$/d'|sed 's/`/\n/g'| sed 's/\^.*//' > PFsOfAnnotation.txt
+```
+
+Ahora sí, evaluamos los 10 dominios más representados.
+```{r}
+PFs <- read.delim("~/Documents/transcriptomic-exercise/output/annotation/PFsOfAnnotation.txt", quote="\"", comment.char="", header = F, as.is = T)
+head(PFs[, 1])
+top10 <- sort(table(PFs[, 1]), decreasing = T)[1:10]
+hist(top10, main = "Frecuencia de Pfams", breaks = 12)
+# Quienes son:
+names(top10)
+```
