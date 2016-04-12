@@ -1,0 +1,22 @@
+---
+title: "Combinations for bayenv2"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Combinations
+
+```{r cars}
+fileNames <- c("PCs.env", "hgdp_matrix_1", "hgdp_no_X_37_freqs", "pooled_snps.txt", "rs316", "samplesize.txt")
+
+fileCombs <- combn(fileNames, 4)
+
+for (i in 1:ncol(fileCombs)){
+  commd <- paste("./calc_bf.sh", paste(fileCombs[, i], collapse = " "), "100000 100000")
+  print(commd)
+  print(system(commd))
+}
+```
